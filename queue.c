@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,6 +42,22 @@ void q_free(struct list_head *l)
 /* Insert an element at head of queue */
 bool q_insert_head(struct list_head *head, char *s)
 {
+    if (!head || !s)
+        return false;
+    element_t *new_ele = malloc(sizeof(element_t));
+    if (!new_ele) {
+        free(new_ele);
+        return false;
+    }
+    size_t len = strlen(s) + 1;
+    char *new_str = malloc(len * sizeof(char));
+    if (!new_str) {
+        free(new_str);
+        free(new_ele);
+        return false;
+    }
+    new_ele->value = new_str;
+    list_add(&new_ele->list, head);
     return true;
 }
 
