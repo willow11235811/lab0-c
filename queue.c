@@ -242,16 +242,17 @@ void q_sort(struct list_head *head)
 
     /* Find the middle point */
     struct list_head *fast, *slow;
-    for (fast = head, slow = head; fast != head && fast->next != head;) {
+    fast = head, slow = head;
+    do {
         fast = fast->next->next;
         slow = slow->next;
-    }
+    } while (fast != head && fast->next != head);
 
     /* Divide into left and right parts */
     LIST_HEAD(left);
     LIST_HEAD(right);
-    list_splice_tail_init(head, &right);
-    list_cut_position(&left, &right, slow);
+    list_cut_position(&left, head, slow);
+    list_cut_position(&right, head, head->prev);
 
     /* Recursion */
     q_sort(&left);
