@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "list.h"
 #include "queue.h"
 
 /* Notice: sometimes, Cppcheck would find the potential NULL pointer bugs,
@@ -149,6 +150,19 @@ bool q_delete_mid(struct list_head *head)
 bool q_delete_dup(struct list_head *head)
 {
     // https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/
+    if (!head)
+        return false;
+
+    struct list_head *node, *save, *tmp;
+    list_for_each_safe (node, save, head) {
+        for (tmp = save; tmp != head; tmp = tmp->next)
+            if (!strcmp(list_entry(node, element_t, list)->value,
+                        list_entry(tmp, element_t, list)->value)) {
+                list_del(node);
+                q_release_element(list_entry(node, element_t, list));
+                break;
+            }
+    }
     return true;
 }
 
