@@ -213,8 +213,51 @@ void q_reverseK(struct list_head *head, int k)
     }
 }
 
+static inline void merge_list(struct list_head *head,
+                              struct list_head *left,
+                              struct list_head *right)
+{
+    while (!list_empty(left) && !list_empty(right)) {
+        if (strcmp(list_entry(left->next, element_t, list)->value,
+                   list_entry(right->next, element_t, list)->value) < 0) {
+            list_move_tail(left->next, head);
+        } else {
+            list_move_tail(right->next, head);
+        }
+    }
+
+    if (!list_empty(left)) {
+        list_splice_tail_init(left, head);
+    } else {
+        list_splice_tail_init(right, head);
+    }
+}
+
 /* Sort elements of queue in ascending order */
-void q_sort(struct list_head *head) {}
+void q_sort(struct list_head *head)
+{
+    /* Using merge sort */
+    if (!head || list_empty(head) || list_is_singular(head))
+        return;
+
+    /* Find the middle point */
+    struct list_head *fast, *slow;
+    for (fast = head, slow = head; fast != head && fast->next != head;) {
+        fast = fast->next->next;
+        slow = slow->next;
+    }
+
+    /* Divide into left and right parts */
+    LIST_HEAD(left);
+    LIST_HEAD(right);
+    list_splice_tail_init(head, &right);
+    list_cut_position(&left, &right, slow);
+
+    /* Recursion */
+    q_sort(&left);
+    q_sort(&right);
+    merge_list(head, &left, &right);
+}
 
 /* Remove every node which has a node with a strictly greater value anywhere to
  * the right side of it */
