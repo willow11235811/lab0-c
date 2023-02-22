@@ -208,7 +208,7 @@ void q_reverseK(struct list_head *head, int k)
             continue;
         i = k;
         LIST_HEAD(tmp);
-        list_cut_position(&tmp, cut, head);
+        list_cut_position(&tmp, cut, node);
         q_reverse(&tmp);
         list_splice(&tmp, cut);
         cut = save->prev;
