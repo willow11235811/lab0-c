@@ -153,15 +153,20 @@ bool q_delete_dup(struct list_head *head)
     if (!head)
         return false;
 
-    struct list_head *node, *save, *tmp;
+    struct list_head *node, *save;
+    bool is_dup = false;
     list_for_each_safe (node, save, head) {
-        for (tmp = save; tmp != head; tmp = tmp->next)
-            if (!strcmp(list_entry(node, element_t, list)->value,
-                        list_entry(tmp, element_t, list)->value)) {
-                list_del(node);
-                q_release_element(list_entry(node, element_t, list));
-                break;
-            }
+        if (node->next != head &&
+            !strcmp(list_entry(node, element_t, list)->value,
+                    list_entry(save, element_t, list)->value)) {
+            is_dup = true;
+            list_del(node);
+            q_release_element(list_entry(node, element_t, list));
+        } else if (is_dup) {
+            is_dup = false;
+            list_del(node);
+            q_release_element(list_entry(node, element_t, list));
+        }
     }
     return true;
 }
